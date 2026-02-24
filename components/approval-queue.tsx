@@ -71,7 +71,7 @@ export function ApprovalQueue() {
             <XCircle className="h-12 w-12 mx-auto text-destructive mb-4" />
             <h3 className="text-lg font-semibold text-foreground">Access Denied</h3>
             <p className="text-muted-foreground mt-2">
-              You don't have permission to access the approval queue.
+              You don&apos;t have permission to access the approval queue.
             </p>
           </CardContent>
         </Card>
@@ -84,7 +84,7 @@ export function ApprovalQueue() {
       <div>
         <h1 className="text-2xl font-bold text-foreground">Approval Queue</h1>
         <p className="text-muted-foreground mt-1">
-          Review and approve configuration submissions
+          Review and approve service configuration submissions
         </p>
       </div>
 
@@ -105,7 +105,7 @@ export function ApprovalQueue() {
                 <CheckCircle className="h-12 w-12 mx-auto text-green-500 mb-4" />
                 <h3 className="text-lg font-semibold text-foreground">All Caught Up!</h3>
                 <p className="text-muted-foreground mt-2">
-                  No configurations pending approval.
+                  No services pending approval.
                 </p>
               </CardContent>
             </Card>
@@ -115,7 +115,7 @@ export function ApprovalQueue() {
                 <CardHeader>
                   <div className="flex items-start justify-between">
                     <div>
-                      <CardTitle className="text-foreground">{config.name}</CardTitle>
+                      <CardTitle className="text-foreground">{config.serviceDetails?.serviceName || config.name}</CardTitle>
                       <CardDescription className="mt-1">{config.description}</CardDescription>
                     </div>
                     <Badge className="bg-blue-100 text-blue-700">Pending Review</Badge>
@@ -123,7 +123,7 @@ export function ApprovalQueue() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   {/* Config Summary */}
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 bg-muted rounded-lg">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 p-3 sm:p-4 bg-muted rounded-lg">
                     <div className="flex items-center gap-2">
                       <User className="h-4 w-4 text-muted-foreground" />
                       <div>
@@ -132,19 +132,19 @@ export function ApprovalQueue() {
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Car className="h-4 w-4 text-muted-foreground" />
+                      <Settings className="h-4 w-4 text-muted-foreground" />
                       <div>
-                        <p className="text-xs text-muted-foreground">Vehicle</p>
+                        <p className="text-xs text-muted-foreground">CCSGen</p>
                         <p className="text-sm font-medium text-foreground">
-                          {config.vehiclePayload.vehicleModel} {config.vehiclePayload.year}
+                          {config.serviceDetails?.ccsGen || "—"}
                         </p>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Settings className="h-4 w-4 text-muted-foreground" />
+                      <Car className="h-4 w-4 text-muted-foreground" />
                       <div>
-                        <p className="text-xs text-muted-foreground">ECU Type</p>
-                        <p className="text-sm font-medium text-foreground">{config.vehiclePayload.ecuType}</p>
+                        <p className="text-xs text-muted-foreground">DCM Version</p>
+                        <p className="text-sm font-medium text-foreground">{config.vehiclePayload?.dcmVersion || "—"}</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
@@ -163,7 +163,7 @@ export function ApprovalQueue() {
                     <div className="flex items-center gap-2 min-w-max">
                       <div className="flex items-center gap-2 px-3 py-2 bg-card border border-border rounded-md">
                         <Settings className="h-4 w-4 text-primary" />
-                        <span className="text-xs font-medium text-foreground">Master Config</span>
+                        <span className="text-xs font-medium text-foreground">Service Details</span>
                       </div>
                       <ArrowRight className="h-4 w-4 text-muted-foreground" />
                       <div className="flex items-center gap-2 px-3 py-2 bg-card border border-border rounded-md">
@@ -189,7 +189,7 @@ export function ApprovalQueue() {
                   </div>
 
                   {/* Action Buttons */}
-                  <div className="flex items-center justify-end gap-3 pt-2">
+                  <div className="flex items-center justify-end gap-2 sm:gap-3 flex-wrap pt-2">
                     <Button
                       variant="outline"
                       onClick={() => setSelectedConfig(config)}
@@ -226,7 +226,7 @@ export function ApprovalQueue() {
                 <Clock className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
                 <h3 className="text-lg font-semibold text-foreground">No History</h3>
                 <p className="text-muted-foreground mt-2">
-                  No configurations have been processed yet.
+                  No services have been processed yet.
                 </p>
               </CardContent>
             </Card>
@@ -246,9 +246,9 @@ export function ApprovalQueue() {
                         </div>
                       )}
                       <div>
-                        <p className="font-medium text-foreground">{config.name}</p>
+                        <p className="font-medium text-foreground">{config.serviceDetails?.serviceName || config.name}</p>
                         <p className="text-sm text-muted-foreground">
-                          {config.vehiclePayload.vehicleModel} {config.vehiclePayload.year} - {config.vehiclePayload.ecuType}
+                          {config.serviceDetails?.ccsGen || "—"} | Gateway: {config.serviceDetails?.gateway || "—"}
                         </p>
                       </div>
                     </div>
@@ -293,19 +293,19 @@ export function ApprovalQueue() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle className="text-foreground">
-              {approvalAction === "approve" ? "Approve Configuration" : "Reject Configuration"}
+              {approvalAction === "approve" ? "Approve Service" : "Reject Service"}
             </DialogTitle>
             <DialogDescription>
               {approvalAction === "approve"
-                ? "This configuration will be approved and stored in file storage."
-                : "This configuration will be rejected and sent back for revision."}
+                ? "This service configuration will be approved and stored in file storage."
+                : "This service configuration will be rejected and sent back for revision."}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div className="p-4 bg-muted rounded-lg">
-              <p className="font-medium text-foreground">{selectedConfig?.name}</p>
+              <p className="font-medium text-foreground">{selectedConfig?.serviceDetails?.serviceName || selectedConfig?.name}</p>
               <p className="text-sm text-muted-foreground mt-1">
-                {selectedConfig?.vehiclePayload.vehicleModel} {selectedConfig?.vehiclePayload.year}
+                {selectedConfig?.serviceDetails?.ccsGen || "—"} | {selectedConfig?.serviceDetails?.actionType || "—"}
               </p>
             </div>
             <div className="space-y-2">
@@ -318,7 +318,7 @@ export function ApprovalQueue() {
                 placeholder={
                   approvalAction === "approve"
                     ? "Add any notes for this approval..."
-                    : "Explain why this configuration is being rejected..."
+                    : "Explain why this service is being rejected..."
                 }
                 rows={3}
               />
@@ -347,43 +347,46 @@ export function ApprovalQueue() {
       <Dialog open={!!selectedConfig && !showApprovalDialog} onOpenChange={() => setSelectedConfig(null)}>
         <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="text-foreground">{selectedConfig?.name}</DialogTitle>
+            <DialogTitle className="text-foreground">{selectedConfig?.serviceDetails?.serviceName || selectedConfig?.name}</DialogTitle>
             <DialogDescription>{selectedConfig?.description}</DialogDescription>
           </DialogHeader>
           {selectedConfig && (
             <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="p-3 bg-muted rounded-lg">
-                  <p className="text-xs text-muted-foreground">Master Config</p>
-                  <p className="text-sm font-medium text-foreground mt-1">UID: {selectedConfig.masterConfig.uid}</p>
-                  <p className="text-sm text-foreground">CCS: {selectedConfig.masterConfig.ccsGen}</p>
-                  <p className="text-sm text-foreground">Gateway: {selectedConfig.masterConfig.gateway}</p>
+                  <p className="text-xs text-muted-foreground">Service Details</p>
+                  <p className="text-sm font-medium text-foreground mt-1">CCSGen: {selectedConfig.serviceDetails?.ccsGen}</p>
+                  <p className="text-sm text-foreground">UID: {selectedConfig.serviceDetails?.uid?.join(", ")}</p>
+                  <p className="text-sm text-foreground">Gateway: {selectedConfig.serviceDetails?.gateway}</p>
+                  <p className="text-sm text-foreground">Action: {selectedConfig.serviceDetails?.actionType}</p>
                 </div>
                 <div className="p-3 bg-muted rounded-lg">
                   <p className="text-xs text-muted-foreground">Application Payload</p>
-                  <p className="text-sm font-medium text-foreground mt-1">App: {selectedConfig.applicationPayload.appId}</p>
-                  <p className="text-sm text-foreground">Version: {selectedConfig.applicationPayload.version}</p>
-                  <p className="text-sm text-foreground truncate">Endpoint: {selectedConfig.applicationPayload.endpoint}</p>
+                  {selectedConfig.applicationPayload?.keyValues?.map((kv, i) => (
+                    <p key={i} className="text-sm text-foreground">{kv.key}: {kv.value}</p>
+                  ))}
                 </div>
                 <div className="p-3 bg-muted rounded-lg">
                   <p className="text-xs text-muted-foreground">Vehicle Payload</p>
-                  <p className="text-sm font-medium text-foreground mt-1">{selectedConfig.vehiclePayload.vehicleModel} {selectedConfig.vehiclePayload.year}</p>
-                  <p className="text-sm text-foreground">ECU: {selectedConfig.vehiclePayload.ecuType}</p>
-                  <p className="text-sm text-foreground">VIN: {selectedConfig.vehiclePayload.vin || "N/A"}</p>
+                  <p className="text-sm font-medium text-foreground mt-1">DCM: {selectedConfig.vehiclePayload?.dcmVersion}</p>
+                  {selectedConfig.vehiclePayload?.attributes?.map((kv, i) => (
+                    <p key={i} className="text-sm text-foreground">{kv.key}: {kv.value}</p>
+                  ))}
                 </div>
                 <div className="p-3 bg-muted rounded-lg">
-                  <p className="text-xs text-muted-foreground">ACK Config</p>
-                  <p className="text-sm font-medium text-foreground mt-1">Timeout: {selectedConfig.ackConfig.timeout}ms</p>
-                  <p className="text-sm text-foreground">Retries: {selectedConfig.ackConfig.retryCount}</p>
-                  <p className="text-sm text-foreground">Type: {selectedConfig.ackConfig.acknowledgmentType}</p>
+                  <p className="text-xs text-muted-foreground">ACK Configuration</p>
+                  <p className="text-sm font-medium text-foreground mt-1">DCM: {selectedConfig.ackConfig?.dcmVersion}</p>
+                  <p className="text-sm text-foreground">ACK Signal: {selectedConfig.ackConfig?.ackSignal}</p>
+                  <p className="text-sm text-foreground">Error Signal: {selectedConfig.ackConfig?.errorSignal}</p>
                 </div>
               </div>
               <div className="p-3 bg-muted rounded-lg">
                 <p className="text-xs text-muted-foreground">Operation Result</p>
-                <div className="grid grid-cols-3 gap-2 mt-1">
-                  <p className="text-sm text-foreground">Success: {selectedConfig.operationResult.successCriteria}</p>
-                  <p className="text-sm text-foreground">Error: {selectedConfig.operationResult.errorHandling}</p>
-                  <p className="text-sm text-foreground">Log: {selectedConfig.operationResult.loggingLevel}</p>
+                <p className="text-sm text-foreground mt-1">DCM: {selectedConfig.operationResult?.dcmVersion}</p>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mt-1">
+                  {selectedConfig.operationResult?.results?.map((r, i) => (
+                    <p key={i} className="text-sm text-foreground">{r.resultKey}: {r.resultValue}</p>
+                  ))}
                 </div>
               </div>
             </div>

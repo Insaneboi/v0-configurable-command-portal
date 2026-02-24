@@ -4,7 +4,6 @@ import React from "react"
 
 import { useState } from "react"
 import { useAuth } from "@/lib/auth-context"
-import { NissanLogo } from "@/components/nissan-logo"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -44,15 +43,15 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
   return (
     <div className="min-h-screen flex flex-col bg-background">
       {/* Header */}
-      <header className="border-b border-border bg-card px-6 py-4">
-        <NissanLogo className="h-8 w-auto text-primary" />
+      <header className="border-b border-border bg-card px-4 sm:px-6 py-4">
+        <span className="text-lg font-bold text-primary">Nissan Motor Co.</span>
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 flex items-center justify-center p-6">
+      <main className="flex-1 flex items-center justify-center p-4 sm:p-6">
         <Card className="w-full max-w-md shadow-lg">
           <CardHeader className="text-center space-y-2">
-            <CardTitle className="text-2xl font-bold text-foreground">
+            <CardTitle className="text-xl sm:text-2xl font-bold text-foreground">
               Configurable Command Portal
             </CardTitle>
             <CardDescription className="text-muted-foreground">
@@ -119,7 +118,7 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-border bg-card px-6 py-4 text-center text-sm text-muted-foreground">
+      <footer className="border-t border-border bg-card px-4 sm:px-6 py-4 text-center text-sm text-muted-foreground">
         Nissan Configurable Command Portal - Internal Use Only
       </footer>
     </div>

@@ -48,35 +48,35 @@ export function ConfigurationList({ onCreateNew, onEdit, onView }: Configuration
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Configurations</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-foreground">Configured Services</h1>
           <p className="text-muted-foreground mt-1">
-            Manage your command configurations
+            Manage your service configurations
           </p>
         </div>
         <Button onClick={onCreateNew} className="bg-primary text-primary-foreground hover:bg-primary/90">
           <Plus className="h-4 w-4 mr-2" />
-          New Configuration
+          Add New Service
         </Button>
       </div>
 
       {/* Search & Filters */}
-      <div className="flex items-center gap-4">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
         <div className="relative flex-1 max-w-sm">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input placeholder="Search configurations..." className="pl-10" />
+          <Input placeholder="Search services..." className="pl-10" />
         </div>
       </div>
 
       {/* Table */}
-      <div className="border border-border rounded-lg bg-card overflow-hidden">
-        <Table>
+      <div className="border border-border rounded-lg bg-card overflow-x-auto">
+        <Table className="min-w-[700px]">
           <TableHeader>
             <TableRow className="bg-muted/50">
-              <TableHead className="text-foreground font-semibold">Name</TableHead>
+              <TableHead className="text-foreground font-semibold">Configured Services</TableHead>
               <TableHead className="text-foreground font-semibold">Status</TableHead>
-              <TableHead className="text-foreground font-semibold">Vehicle</TableHead>
+              <TableHead className="text-foreground font-semibold">Generation (CCSGen)</TableHead>
               <TableHead className="text-foreground font-semibold">Created By</TableHead>
               <TableHead className="text-foreground font-semibold">Last Updated</TableHead>
               <TableHead className="text-foreground font-semibold w-12"></TableHead>
@@ -87,7 +87,7 @@ export function ConfigurationList({ onCreateNew, onEdit, onView }: Configuration
               <TableRow key={config.id} className="hover:bg-muted/30">
                 <TableCell>
                   <div>
-                    <p className="font-medium text-foreground">{config.name}</p>
+                    <p className="font-medium text-foreground">{config.serviceDetails?.serviceName || config.name}</p>
                     <p className="text-sm text-muted-foreground truncate max-w-xs">
                       {config.description}
                     </p>
@@ -99,7 +99,7 @@ export function ConfigurationList({ onCreateNew, onEdit, onView }: Configuration
                   </Badge>
                 </TableCell>
                 <TableCell className="text-foreground">
-                  {config.vehiclePayload.vehicleModel} {config.vehiclePayload.year}
+                  {config.serviceDetails?.ccsGen || "—"}
                 </TableCell>
                 <TableCell className="text-muted-foreground">
                   {config.createdBy.split("@")[0]}

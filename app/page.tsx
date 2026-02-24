@@ -9,9 +9,8 @@ import { DashboardOverview } from "@/components/dashboard-overview"
 import { ConfigurationList } from "@/components/configuration-list"
 import { ConfigurationWizard } from "@/components/configuration-wizard"
 import { ApprovalQueue } from "@/components/approval-queue"
-import { NissanLogo } from "@/components/nissan-logo"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Cloud, HardDrive, Database, FileJson } from "lucide-react"
+import { Cloud, HardDrive, Database, FileJson, Menu } from "lucide-react"
 
 function MasterDataView() {
   return (
@@ -225,6 +224,7 @@ function AppContent() {
   const [currentView, setCurrentView] = useState("dashboard")
   const [editingConfig, setEditingConfig] = useState<Configuration | null>(null)
   const [isCreating, setIsCreating] = useState(false)
+  const [sidebarOpen, setSidebarOpen] = useState(false)
 
   if (!isAuthenticated) {
     return <LoginForm onSuccess={() => setCurrentView("dashboard")} />
@@ -258,7 +258,7 @@ function AppContent() {
           <ConfigurationList
             onCreateNew={handleCreateNew}
             onEdit={handleEdit}
-            onView={(config) => console.log("[v0] View config:", config)}
+            onView={() => {}}
           />
         )
       case "approvals":
@@ -280,17 +280,21 @@ function AppContent() {
           setIsCreating(false)
           setCurrentView(view)
         }}
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
       />
-      <main className="flex-1 overflow-auto">
-        <header className="sticky top-0 z-10 bg-card border-b border-border px-6 py-3 flex items-center justify-between">
+      <main className="flex-1 flex flex-col overflow-hidden">
+        <header className="shrink-0 z-10 bg-card border-b border-border px-3 sm:px-4 md:px-6 py-3 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <NissanLogo className="h-6 w-auto text-primary md:hidden" />
+            <button className="md:hidden cursor-pointer" onClick={() => setSidebarOpen(true)}>
+              <Menu className="h-5 w-5 text-muted-foreground" />
+            </button>
             <h2 className="text-sm font-medium text-muted-foreground">
               Configurable Command Portal
             </h2>
           </div>
         </header>
-        <div className="p-6">{renderContent()}</div>
+        <div className="flex-1 p-3 sm:p-4 md:p-6 overflow-auto">{renderContent()}</div>
       </main>
     </div>
   )

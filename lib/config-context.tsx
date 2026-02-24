@@ -2,6 +2,19 @@
 
 import { createContext, useContext, useState, type ReactNode } from "react"
 
+export interface KeyValuePair {
+  key: string
+  type: "string" | "number" | "float" | "boolean" | "range"
+  value: string
+  rangeMin?: string
+  rangeMax?: string
+}
+
+export interface OperationResultEntry {
+  resultKey: string
+  resultValue: string
+}
+
 export interface Configuration {
   id: string
   name: string
@@ -10,33 +23,38 @@ export interface Configuration {
   createdAt: Date
   updatedAt: Date
   createdBy: string
-  masterConfig: {
-    uid: string
+  serviceDetails: {
+    serviceName: string
     ccsGen: string
+    uid: string[]
     gateway: string
-    signals: string[]
+    actionType: string
+    ucdRefreshApplicable: boolean
+    aiviSyncApplicable: boolean
+    svtCheck: boolean
+    privacyCheck: boolean
+    ownershipCheck: boolean
   }
   applicationPayload: {
-    appId: string
-    version: string
-    endpoint: string
-    parameters: Record<string, string>
+    keyValues: KeyValuePair[]
   }
   vehiclePayload: {
-    vehicleModel: string
-    year: string
-    vin: string
-    ecuType: string
+    dcmVersion: string
+    targetId: string
+    attributes: (KeyValuePair & { appKey?: string })[]
+    vehicleAttributes: KeyValuePair[]
   }
   ackConfig: {
-    timeout: number
-    retryCount: number
-    acknowledgmentType: string
+    dcmVersion: string
+    targetId: string
+    ackSignal: string
+    errorSignal: string
   }
   operationResult: {
-    successCriteria: string
-    errorHandling: string
-    loggingLevel: string
+    dcmVersion: string
+    targetId: string
+    judgementSignals: string[]
+    results: OperationResultEntry[]
   }
   approvalComments?: string
   approvedBy?: string
@@ -56,6 +74,26 @@ interface ConfigContextType {
 
 const ConfigContext = createContext<ConfigContextType | undefined>(undefined)
 
+// Simulated backend data for CCSGen and UIDs
+export const BACKEND_CCSGEN_OPTIONS = ["Gen2", "Gen3", "Gen4"]
+
+export const BACKEND_UID_BY_CCSGEN: Record<string, string[]> = {
+  Gen2: ["UID-201", "UID-202", "UID-203", "UID-204"],
+  Gen3: ["UID-301", "UID-302", "UID-303", "UID-304", "UID-305"],
+  Gen4: ["UID-401", "UID-402", "UID-403"],
+}
+
+export const GATEWAY_OPTIONS = ["GDC", "Renault", "Nissan"]
+
+export const ERROR_SIGNAL_OPTIONS = [
+  "ERR_TIMEOUT",
+  "ERR_COMM_FAILURE",
+  "ERR_INVALID_RESPONSE",
+  "ERR_CRC_MISMATCH",
+  "ERR_SEQUENCE",
+  "ERR_UNKNOWN",
+]
+
 const initialConfigurations: Configuration[] = [
   {
     id: "1",
@@ -65,33 +103,51 @@ const initialConfigurations: Configuration[] = [
     createdAt: new Date("2024-01-15"),
     updatedAt: new Date("2024-01-20"),
     createdBy: "john.doe@nissan.com",
-    masterConfig: {
-      uid: "UID-001",
+    serviceDetails: {
+      serviceName: "ECU Firmware Update",
       ccsGen: "Gen3",
-      gateway: "CAN-GW-01",
-      signals: ["SIG_001", "SIG_002"],
+      uid: ["UID-301", "UID-302"],
+      gateway: "GDC",
+      actionType: "firmware_update",
+      ucdRefreshApplicable: true,
+      aiviSyncApplicable: false,
+      svtCheck: true,
+      privacyCheck: true,
+      ownershipCheck: false,
     },
     applicationPayload: {
-      appId: "APP-ECU-001",
-      version: "2.1.0",
-      endpoint: "/api/v1/ecu/update",
-      parameters: { mode: "full", verify: "true" },
+      keyValues: [
+        { key: "mode", type: "string", value: "full" },
+        { key: "verify", type: "string", value: "true" },
+        { key: "target_ecu", type: "string", value: "BCM" },
+      ],
     },
     vehiclePayload: {
-      vehicleModel: "Altima",
-      year: "2024",
-      vin: "1N4BL4BV*NC******",
-      ecuType: "BCM",
+      dcmVersion: "DCM-3.2.1",
+      targetId: "TGT-001",
+      attributes: [
+        { key: "protocol", type: "string", value: "CAN-FD" },
+        { key: "baud_rate", type: "string", value: "500kbps" },
+      ],
+      vehicleAttributes: [
+        { key: "model", type: "string", value: "Altima" },
+        { key: "year", type: "string", value: "2024" },
+      ],
     },
     ackConfig: {
-      timeout: 30000,
-      retryCount: 3,
-      acknowledgmentType: "SYNC",
+      dcmVersion: "DCM-3.2.1",
+      targetId: "TGT-001",
+      ackSignal: "1",
+      errorSignal: "ERR_TIMEOUT",
     },
     operationResult: {
-      successCriteria: "STATUS_OK",
-      errorHandling: "ROLLBACK",
-      loggingLevel: "DEBUG",
+      dcmVersion: "DCM-3.2.1",
+      targetId: "TGT-001",
+      judgementSignals: ["SIG_OK", "SIG_COMPLETE"],
+      results: [
+        { resultKey: "status", resultValue: "STATUS_OK" },
+        { resultKey: "error_handling", resultValue: "ROLLBACK" },
+      ],
     },
     approvedBy: "admin@nissan.com",
     approvedAt: new Date("2024-01-20"),
@@ -104,33 +160,49 @@ const initialConfigurations: Configuration[] = [
     createdAt: new Date("2024-01-18"),
     updatedAt: new Date("2024-01-18"),
     createdBy: "jane.smith@nissan.com",
-    masterConfig: {
-      uid: "UID-002",
+    serviceDetails: {
+      serviceName: "Vehicle Diagnostics",
       ccsGen: "Gen3",
-      gateway: "CAN-GW-02",
-      signals: ["SIG_003"],
+      uid: ["UID-303"],
+      gateway: "Renault",
+      actionType: "diagnostics_run",
+      ucdRefreshApplicable: false,
+      aiviSyncApplicable: true,
+      svtCheck: false,
+      privacyCheck: true,
+      ownershipCheck: true,
     },
     applicationPayload: {
-      appId: "APP-DIAG-001",
-      version: "1.5.0",
-      endpoint: "/api/v1/diagnostics/run",
-      parameters: { depth: "full" },
+      keyValues: [
+        { key: "depth", type: "string", value: "full" },
+        { key: "include_dtc", type: "string", value: "true" },
+      ],
     },
     vehiclePayload: {
-      vehicleModel: "Rogue",
-      year: "2024",
-      vin: "5N1AT3BB*NC******",
-      ecuType: "PCM",
+      dcmVersion: "DCM-3.1.0",
+      targetId: "TGT-002",
+      attributes: [
+        { key: "protocol", type: "string", value: "UDS" },
+      ],
+      vehicleAttributes: [
+        { key: "model", type: "string", value: "Rogue" },
+        { key: "year", type: "string", value: "2024" },
+      ],
     },
     ackConfig: {
-      timeout: 60000,
-      retryCount: 2,
-      acknowledgmentType: "ASYNC",
+      dcmVersion: "DCM-3.1.0",
+      targetId: "TGT-002",
+      ackSignal: "1",
+      errorSignal: "ERR_COMM_FAILURE",
     },
     operationResult: {
-      successCriteria: "COMPLETE",
-      errorHandling: "LOG_AND_CONTINUE",
-      loggingLevel: "INFO",
+      dcmVersion: "DCM-3.1.0",
+      targetId: "TGT-002",
+      judgementSignals: ["SIG_DIAG_OK"],
+      results: [
+        { resultKey: "status", resultValue: "COMPLETE" },
+        { resultKey: "error_handling", resultValue: "LOG_AND_CONTINUE" },
+      ],
     },
   },
   {
@@ -141,33 +213,53 @@ const initialConfigurations: Configuration[] = [
     createdAt: new Date("2024-01-22"),
     updatedAt: new Date("2024-01-22"),
     createdBy: "john.doe@nissan.com",
-    masterConfig: {
-      uid: "UID-003",
+    serviceDetails: {
+      serviceName: "Battery Management",
       ccsGen: "Gen4",
-      gateway: "EV-GW-01",
-      signals: ["SIG_BAT_001", "SIG_BAT_002", "SIG_BAT_003"],
+      uid: ["UID-401", "UID-402"],
+      gateway: "GDC",
+      actionType: "battery_manage",
+      ucdRefreshApplicable: true,
+      aiviSyncApplicable: true,
+      svtCheck: false,
+      privacyCheck: false,
+      ownershipCheck: true,
     },
     applicationPayload: {
-      appId: "APP-BAT-001",
-      version: "3.0.0",
-      endpoint: "/api/v1/battery/manage",
-      parameters: { optimize: "true", report: "true" },
+      keyValues: [
+        { key: "optimize", type: "string", value: "true" },
+        { key: "report", type: "string", value: "true" },
+        { key: "cell_balance", type: "string", value: "enabled" },
+      ],
     },
     vehiclePayload: {
-      vehicleModel: "LEAF",
-      year: "2024",
-      vin: "1N4AZ1CP*NC******",
-      ecuType: "BMS",
+      dcmVersion: "DCM-4.0.0",
+      targetId: "TGT-003",
+      attributes: [
+        { key: "protocol", type: "string", value: "CAN-FD" },
+        { key: "battery_type", type: "string", value: "Li-ion" },
+      ],
+      vehicleAttributes: [
+        { key: "model", type: "string", value: "LEAF" },
+        { key: "year", type: "string", value: "2024" },
+        { key: "drivetrain", type: "string", value: "EV" },
+      ],
     },
     ackConfig: {
-      timeout: 120000,
-      retryCount: 5,
-      acknowledgmentType: "SYNC",
+      dcmVersion: "DCM-4.0.0",
+      targetId: "TGT-003",
+      ackSignal: "0",
+      errorSignal: "ERR_CRC_MISMATCH",
     },
     operationResult: {
-      successCriteria: "BAT_OK",
-      errorHandling: "SAFE_MODE",
-      loggingLevel: "DEBUG",
+      dcmVersion: "DCM-4.0.0",
+      targetId: "TGT-003",
+      judgementSignals: ["SIG_BAT_OK", "SIG_CHARGE_COMPLETE"],
+      results: [
+        { resultKey: "status", resultValue: "BAT_OK" },
+        { resultKey: "error_handling", resultValue: "SAFE_MODE" },
+        { resultKey: "logging", resultValue: "DEBUG" },
+      ],
     },
   },
 ]

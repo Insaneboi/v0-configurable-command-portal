@@ -20,9 +20,9 @@ export function DashboardOverview() {
     .slice(0, 5)
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
+        <h1 className="text-xl sm:text-2xl font-bold text-foreground">Dashboard</h1>
         <p className="text-muted-foreground mt-1">
           Overview of configuration management activities
         </p>
@@ -111,7 +111,7 @@ export function DashboardOverview() {
                   <div>
                     <p className="font-medium text-foreground text-sm">{config.name}</p>
                     <p className="text-xs text-muted-foreground">
-                      {config.vehiclePayload.vehicleModel} {config.vehiclePayload.year}
+                      {config.serviceDetails?.ccsGen || "—"} | {config.serviceDetails?.actionType || "—"}
                     </p>
                   </div>
                   <div className="text-right">
@@ -146,8 +146,8 @@ export function DashboardOverview() {
                   <span className="text-primary font-bold">1</span>
                 </div>
                 <div>
-                  <p className="font-medium text-foreground text-sm">Master Config</p>
-                  <p className="text-xs text-muted-foreground">UID, CCSGen, Gateway, Signals</p>
+                  <p className="font-medium text-foreground text-sm">Service Details</p>
+                  <p className="text-xs text-muted-foreground">Service Name, CCSGen, UID, Gateway, Action Type</p>
                 </div>
               </div>
               <div className="flex items-center gap-4">
@@ -156,7 +156,7 @@ export function DashboardOverview() {
                 </div>
                 <div>
                   <p className="font-medium text-foreground text-sm">Application Payload</p>
-                  <p className="text-xs text-muted-foreground">App ID, Version, Endpoint</p>
+                  <p className="text-xs text-muted-foreground">Key-Value Configuration</p>
                 </div>
               </div>
               <div className="flex items-center gap-4">
@@ -165,7 +165,7 @@ export function DashboardOverview() {
                 </div>
                 <div>
                   <p className="font-medium text-foreground text-sm">Vehicle Payload</p>
-                  <p className="text-xs text-muted-foreground">Model, Year, VIN, ECU Type</p>
+                  <p className="text-xs text-muted-foreground">DCM Version, Attributes</p>
                 </div>
               </div>
               <div className="flex items-center gap-4">
@@ -173,8 +173,8 @@ export function DashboardOverview() {
                   <span className="text-primary font-bold">4</span>
                 </div>
                 <div>
-                  <p className="font-medium text-foreground text-sm">ACK Config</p>
-                  <p className="text-xs text-muted-foreground">Timeout, Retry, ACK Type</p>
+                  <p className="font-medium text-foreground text-sm">ACK Configuration</p>
+                  <p className="text-xs text-muted-foreground">Acknowledgement & Error Signals</p>
                 </div>
               </div>
               <div className="flex items-center gap-4">
@@ -183,7 +183,7 @@ export function DashboardOverview() {
                 </div>
                 <div>
                   <p className="font-medium text-foreground text-sm">Operation Result</p>
-                  <p className="text-xs text-muted-foreground">Success Criteria, Error Handling</p>
+                  <p className="text-xs text-muted-foreground">Operation Result Entries</p>
                 </div>
               </div>
             </div>
